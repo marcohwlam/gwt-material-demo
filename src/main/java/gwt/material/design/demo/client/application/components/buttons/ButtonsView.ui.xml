@@ -28,6 +28,10 @@
   </ui:style>
 
   <g:HTMLPanel ui:field="panel">
+
+    <m:MaterialRow addStyleNames="code">
+      <m:MaterialButton text="ASYNC" ui:field="asyncButton" />
+    </m:MaterialRow>
   
     <m:MaterialRow addStyleNames="code">
       <m:MaterialTitle title="Raised" description="The raised button is a standard button that signify actions and seek to give depth to a mostly flat page."/>

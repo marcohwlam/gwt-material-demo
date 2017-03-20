@@ -21,16 +21,23 @@ package gwt.material.design.demo.client.application.components.buttons;
  */
 
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.DoubleClickEvent;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.gwtplatform.mvp.client.ViewImpl;
+import gwt.material.design.client.async.LoadResultCallback;
 import gwt.material.design.client.ui.MaterialButton;
 import gwt.material.design.client.ui.MaterialToast;
+import gwt.material.design.demo.client.application.components.buttons.service.Car;
+import gwt.material.design.demo.client.application.components.buttons.service.CarService;
+import gwt.material.design.demo.client.application.components.buttons.service.CarServiceAsync;
+import gwt.material.design.demo.client.application.components.buttons.service.FakeCarService;
 
 import javax.inject.Inject;
 
@@ -38,7 +45,7 @@ public class ButtonsView extends ViewImpl implements ButtonsPresenter.MyView {
     interface Binder extends UiBinder<Widget, ButtonsView> {
     }
 
-    @UiField MaterialButton btnClick, btnHover, btnDoubleClick;
+    @UiField MaterialButton btnClick, btnHover, btnDoubleClick, asyncButton;
 
     @Inject
     ButtonsView(Binder uiBinder) {
@@ -61,5 +68,30 @@ public class ButtonsView extends ViewImpl implements ButtonsPresenter.MyView {
     void onDoubleClick(DoubleClickEvent e) {
         MaterialToast.fireToast("Double Click Triggered");
         btnDoubleClick.setText("Double Clicked");
+    }
+
+    @UiHandler("asyncButton")
+    void onAsyncButton(ClickEvent e) {
+
+        // Will setup the LoadResultCallback where the async widget has predefined UX upon loading the request
+        // and display the callback result returned by the server
+        LoadResultCallback<Car, MaterialButton<Car>> loadResultCallback = new LoadResultCallback<>(asyncButton);
+
+        // Let the user decide how they perform client to server mechanism (e.g RPC).
+        final CarServiceAsync carServiceAsync = GWT.create(FakeCarService.class);
+        carServiceAsync.getCar(1, new AsyncCallback<Car>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+                loadResultCallback.onFailure(throwable);
+            }
+
+            @Override
+            public void onSuccess(Car car) {
+                loadResultCallback.onSuccess(car);
+            }
+        });
+
+        // Will perform the async load() method and call the asynccallback
+        loadResultCallback.load();
     }
 }
