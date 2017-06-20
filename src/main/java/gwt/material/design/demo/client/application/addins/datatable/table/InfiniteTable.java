@@ -30,13 +30,17 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import gwt.material.design.client.constants.Color;
+import gwt.material.design.client.constants.IconType;
 import gwt.material.design.client.data.component.CategoryComponent;
 import gwt.material.design.client.data.infinite.InfiniteDataView;
 import gwt.material.design.client.ui.MaterialImage;
 import gwt.material.design.client.ui.table.MaterialInfiniteDataTable;
+import gwt.material.design.client.ui.table.TableSubHeader;
 import gwt.material.design.client.ui.table.cell.TextColumn;
 import gwt.material.design.client.ui.table.cell.WidgetColumn;
 import gwt.material.design.demo.client.application.addins.datatable.table.datasource.PersonDataSource;
+import gwt.material.design.demo.client.application.addins.datatable.table.factory.CustomCategoryFactory;
+import gwt.material.design.demo.client.application.addins.datatable.table.factory.CustomInfiniteCategoryFactory;
 import gwt.material.design.demo.client.application.addins.datatable.table.service.FakePersonService;
 import gwt.material.design.demo.client.application.addins.datatable.table.service.PersonServiceAsync;
 
@@ -45,6 +49,21 @@ import java.util.List;
 import static gwt.material.design.jquery.client.api.JQuery.$;
 
 public class InfiniteTable extends Composite {
+
+    public static class CustomCategoryComponent extends CategoryComponent {
+        public CustomCategoryComponent(String category) {
+            super(category);
+        }
+
+        @Override
+        protected void render(TableSubHeader subheader) {
+            super.render(subheader);
+
+            subheader.setOpenIcon(IconType.FOLDER_OPEN);
+            subheader.setCloseIcon(IconType.FOLDER);
+        }
+    }
+
     interface InfiniteGridUiBinder extends UiBinder<HTMLPanel, InfiniteTable> {
     }
 
@@ -69,6 +88,7 @@ public class InfiniteTable extends Composite {
     protected void onLoad() {
         super.onLoad();
         table.getTableTitle().setText("Infinite Table");
+        table.setCategoryFactory(new CustomInfiniteCategoryFactory());
         // Load the categories from the server
         table.setLoadMask(true);
         personService.getCategories(new AsyncCallback<List<String>>() {
